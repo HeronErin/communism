@@ -1,0 +1,6 @@
+MC
+nbt/NBT
+protocol/protocol
+*.o
+.vscode/
+*/*.o
