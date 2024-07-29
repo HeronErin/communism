@@ -9,7 +9,11 @@ SRC   = $(wildcard *.c)
 OBJS= $(SRC:.c=.o)
 
 
-default: server
+default: protocol server
+
+protocol:
+	make -C ../protocol
+
 
 server: $(OBJS)
 	$(CC) $(CFLAGS) -o server $(OBJS)
