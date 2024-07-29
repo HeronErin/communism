@@ -5,7 +5,7 @@ const char resp[] = "HTTP/1.1 200 OK\r\nContent-Length: 12\r\nContent-Type: text
 
 TCP_ACTION incomingHttp(void* worldState, void** playerSate, int fd){
     char data[1024*10] = {0};
-    printf("Hello new \n");
+    // printf("Hello new \n");
     read(fd, &data, 1024*10);
     write(fd, resp, sizeof(resp));
 

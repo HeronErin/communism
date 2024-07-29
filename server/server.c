@@ -86,9 +86,8 @@ int bindServer(const uint16_t port, const int maxConnections, void* worldState, 
         }
         fd_set exceptfds;
         memcpy(&exceptfds, &fdset, sizeof(fd_set));
-        perror("Selecting\n");
+        
         selectCode = select(maxfd + 1, &fdset, NULL, &exceptfds, NULL);
-        perror("Select\n");
 
         if (FD_ISSET(server_fd, &fdset)){
             if ((newClient = accept(server_fd,  

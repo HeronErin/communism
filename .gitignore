@@ -4,3 +4,4 @@ protocol/protocol
 *.o
 .vscode/
 */*.o
+server/server
