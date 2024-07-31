@@ -4,7 +4,7 @@
 
 
 DescriptorMap* makeDescriptorMap(int maxElements){
-    DescriptorMap* map = calloc(sizeof(DescriptorMap) + maxElements * sizeof(MapElement),1);
+    DescriptorMap* map = calloc(1, sizeof(DescriptorMap) + maxElements * sizeof(MapElement));
     map->maxElements = maxElements;
     return map;
 }
