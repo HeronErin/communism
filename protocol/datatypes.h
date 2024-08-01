@@ -61,6 +61,7 @@ typedef struct{
 
 
 int decodeVarIntFromFd(int fd, int32_t* res);
+int encodeVarIntToFd (int value, int fd);
 int decodeVarInt(BUFF *buff, int32_t *value);
 int decodeVarIntUnsigned(BUFF *buff, uint32_t *value);
 int decodeVarLong(BUFF *buff, int64_t *value);

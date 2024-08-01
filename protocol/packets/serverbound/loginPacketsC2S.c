@@ -1,7 +1,7 @@
 #include "../../packets.h"
 
 
-const PacketConstructor HanshakeC2S = {0, 4, {
+const PacketConstructor HanshakeC2S = {0, 5, {
     {FID_PROTOCOL_VERSION, DT_VARINT},
     {FID_STRING_SIZE, DT_VARINT},
     {FID_SERVER_ADDRESS, DT_STRING, 255, FID_STRING_SIZE},

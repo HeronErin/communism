@@ -110,6 +110,7 @@ PacketFieldData* searchFieldsForId(PACKET_FIELD_ID field, PacketFieldData* data,
 PacketFieldData* makeFieldDataPackageFor(const FieldConstructor* constructor, int size);
 PacketFieldData* decodePacket(const FieldConstructor* constructor, int size, BUFF* buff);
 int encodePacket(const FieldConstructor *constructor, int size, PacketFieldData* fieldData, BUFF** buff);
+int sendPacketRaw(const PacketConstructor *constructor, PacketFieldData* fieldData, int fd);
 
 // Packet defs:
 

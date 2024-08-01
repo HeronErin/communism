@@ -1,8 +1,9 @@
 #include "../../packets.h"
 
 
-const PacketConstructor StatusResponseS2C  = {0, 1, {
-    {FID_JSON, DT_JSON_TEXT}
+const PacketConstructor StatusResponseS2C  = {0, 2, {
+    {FID_STRING_SIZE, DT_VARINT},
+    {FID_JSON, DT_JSON_TEXT, 0, FID_STRING_SIZE}
 }};
 const PacketConstructor PingResponseS2C  = {1, 1, {
     {FID_PAYLOAD, DT_LONG}

@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
+#include <unistd.h>
 
 PacketFieldData* searchFieldsForId(PACKET_FIELD_ID field, PacketFieldData* data, int length){
     for (int i = 0; i < length; i++){
@@ -48,6 +49,7 @@ static int _bakeLengths(const FieldConstructor *constructor, int size, PacketFie
                 dep = searchFieldsForId(constructor[i].dependsOn, fieldData, i);
                 if (dep == NULL){
                     errno = EBADR;
+                    
                     return 1;
                 }
                 field->stringLength = strlen(field->stringData);
@@ -144,11 +146,11 @@ PacketFieldData* decodePacket(const FieldConstructor* constructor, int size, BUF
                 dep = searchFieldsForId(fieldCons.dependsOn, fieldReturnData, i);
                 if (dep == NULL){
                     errno = EBADR;
+                    perror("1");
                     return NULL;
                 }
                 int size = dep->varIntData;
                 
-
                 if (0 != decodeStringPreSized(buff, &data.stringData, size, fieldCons.length))
                     return NULL;
                 break;
@@ -197,13 +199,15 @@ int encodePacket(const FieldConstructor *constructor, int size, PacketFieldData*
             case DT_TEXT_COMPONENT:
             case DT_JSON_TEXT:
             case DT_BYTE_ARRAY:
-                if (0 != encodeStringPreSized(buff, fieldData->stringData, fieldData->stringLength, constructor[i].sizeInt))
+                // printf("Wow: %llu %d\n",(size_t) fieldData[i].stringData, fieldData[i].stringLength);
+                if (0 != encodeStringPreSized(buff, fieldData[i].stringData, fieldData[i].stringLength, constructor[i].sizeInt))
                     return 1;
+                break;
             case DT_OPTIONAL:
                 dep = searchFieldsForId(constructor[i].dependsOn, fieldData, i);
                 if (dep == NULL || dep->type != DT_BOOL) return 1;
                 if (!dep->boolData) break;
-                if (0 != encodePacket(constructor[i].content, constructor[i].sizeInt, fieldData->optionalFieldData, buff))
+                if (0 != encodePacket(constructor[i].content, constructor[i].sizeInt, fieldData[i].optionalFieldData, buff))
                     return 1;
                 break;
             case DT_ARRAY:
@@ -218,4 +222,20 @@ int encodePacket(const FieldConstructor *constructor, int size, PacketFieldData*
         }
 
     }
+}
+int sendPacketRaw(const PacketConstructor *constructor, PacketFieldData* fieldData, int fd){
+    BUFF* out = makeBuff(0, 0);
+
+    if (0 != encodeVarInt(&out, constructor->id))
+        return 1;
+    if (0 != encodePacket(constructor->fields, constructor->size, fieldData, &out))
+        return 1;
+    if (0 != encodeVarIntToFd(out->size, fd))
+        return 1;
+    if (-1 == write(fd, &out->data, out->size)){
+        return 1;
+    }
+
+    free(out);
+    return 0;
 }

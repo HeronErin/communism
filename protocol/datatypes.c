@@ -64,6 +64,19 @@ int decodeVarIntFromFd(int fd, int32_t* res){
     }while((currentByte & VARINT_CONTINUE_BIT) != 0);
     return 0;
 }
+int encodeVarIntToFd (int value, int fd){
+    uint8_t temp;
+    while (1) {
+        if ((value & ~VARINT_SEGMENT) == 0){
+            temp = value;
+            return -1 == write(fd, &temp, 1) ? 1 : 0;
+        } 
+        temp = (value & VARINT_SEGMENT) | VARINT_CONTINUE_BIT;
+        if (-1 == write(fd, &temp, 1))
+            return 1;
+        value >>= 7;
+    }
+}
 
 
 // ===========================================================
