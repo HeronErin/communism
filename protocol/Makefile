@@ -11,10 +11,14 @@ OBJS= $(SRC:.c=.o)
 
 default: protocol.o
 
-protocol.o: $(OBJS)
-	ar rcs protocol.o $(OBJS)
+packetso:
+	make -C packets
+
+protocol.o: packetso $(OBJS)
+	ar rcs protocol.o $(OBJS) packets/packets.o
 
 clean:
 	$(RM) protocol.o $(OBJS)
+	make -C packets clean
 %.o : %.c
 	$(CC) $(CFLAGS) -c  $< -o $@

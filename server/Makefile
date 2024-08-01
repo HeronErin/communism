@@ -21,5 +21,6 @@ run: server
 	./server
 clean:
 	$(RM) server $(OBJS)
+	make -C ../protocol clean
 %.o : %.c
 	$(CC) $(CFLAGS) -c  $< -o $@

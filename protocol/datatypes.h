@@ -4,6 +4,8 @@
 #include "buffer.h"
 
 typedef enum {
+    DT_UNDEFINED,
+
     // Size: 1 byte
     DT_BOOL,
 
@@ -15,8 +17,10 @@ typedef enum {
     DT_USHORT,
 
     DT_INT,    // 4 bytes
+    DT_UINT,    // 4 bytes
 
     DT_LONG,   // 8 bytes
+    DT_ULONG,   // 8 bytes
     DT_FLOAT,  // 4 bytes
     DT_DOUBLE, // 8 bytes
     
@@ -43,6 +47,8 @@ typedef enum {
     // Arrays
     DT_ARRAY,        // Containing felids 
     DT_BYTE_ARRAY,   // Length prefixed
+
+    DT_OPTIONAL
 
 } NetworkDatatype;
 
