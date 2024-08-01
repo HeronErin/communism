@@ -9,12 +9,12 @@ SRC   = $(wildcard serverbound/*.c clientbound/*.c)
 OBJS= $(SRC:.c=.o)
 
 
-default: packets.o
+default: packetBundle.o
 
-packets.o: $(OBJS)
-	ar rcs packets.o $(OBJS)
+packetBundle.o: $(OBJS)
+	ar rcs packetBundle.o $(OBJS)
 
 clean:
-	$(RM) packets.o $(OBJS)
+	$(RM) packetBundle.o $(OBJS)
 %.o : %.c
 	$(CC) $(CFLAGS) -c  $< -o $@

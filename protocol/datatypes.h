@@ -60,7 +60,7 @@ typedef struct{
 #define STRING_LEN(NNN) (NNN) * 3 + 3
 
 
-int decodeVarIntFromFd(int fd, int* res);
+int decodeVarIntFromFd(int fd, int32_t* res);
 int decodeVarInt(BUFF *buff, int32_t *value);
 int decodeVarIntUnsigned(BUFF *buff, uint32_t *value);
 int decodeVarLong(BUFF *buff, int64_t *value);
@@ -70,7 +70,7 @@ int decodeVarLongUnsigned(BUFF *buff, uint64_t *value);
 int encodeVarIntUnsigned(BUFF** buff, uint32_t value);
 int encodeVarLongUnsigned(BUFF** buff, uint64_t value);
 int encodeVarInt(BUFF** buff, int32_t value);
-int encodeVarLong(BUFF** buff, int32_t value);
+int encodeVarLong(BUFF** buff, int64_t value);
 
 int decodeByte(BUFF* buff, int8_t* val);
 int decodeByteUnsigned(BUFF* buff, uint8_t* val);
@@ -100,3 +100,5 @@ int encodeUUID(BUFF** buff, UUID uuid);
 int decodeFixedString(BUFF* buff, uint8_t* result, size_t maxSize);
 int decodeString(BUFF* buff, uint8_t** result, size_t knownMaxOrDefault);
 int encodeString(BUFF** buff, const uint8_t* string, size_t knownMaxOrDefault);
+int decodeStringPreSized(BUFF* buff, uint8_t** result, size_t size, size_t knownMaxOrDefault);
+int encodeStringPreSized(BUFF** buff, const uint8_t* string, size_t byteLength, size_t knownMaxOrDefault);

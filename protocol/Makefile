@@ -15,7 +15,7 @@ packetso:
 	make -C packets
 
 protocol.o: packetso $(OBJS)
-	ar rcs protocol.o $(OBJS) packets/packets.o
+	ar rcsT protocol.o $(OBJS) packets/packetBundle.o
 
 clean:
 	$(RM) protocol.o $(OBJS)

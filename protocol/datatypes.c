@@ -44,7 +44,7 @@ DEF_VAR_DECODE(decodeVarIntUnsigned, uint32_t, 32);
 DEF_VAR_DECODE(decodeVarLong, int64_t, 64);
 DEF_VAR_DECODE(decodeVarLongUnsigned, uint64_t, 64);
 
-int decodeVarIntFromFd(int fd, int* res){
+int decodeVarIntFromFd(int fd, int32_t* res){
     *res = 0;
     int position = 0;
     uint8_t currentByte;
@@ -84,7 +84,7 @@ DEF_VAR_WRITE(encodeVarIntUnsigned, uint32_t);
 DEF_VAR_WRITE(encodeVarLongUnsigned, uint64_t);
 
 int encodeVarInt(BUFF** buff, int32_t value){ return encodeVarIntUnsigned(buff, value); }
-int encodeVarLong(BUFF** buff, int32_t value){ return encodeVarLongUnsigned(buff, value); }
+int encodeVarLong(BUFF** buff, int64_t value){ return encodeVarLongUnsigned(buff, value); }
 
 // ===========================================================
 //                  Primitive datatypes
@@ -210,6 +210,23 @@ int decodeString(BUFF* buff, uint8_t** result, size_t knownMaxOrDefault){
     buff->index += size;
     return 0;
 }
+int decodeStringPreSized(BUFF* buff, uint8_t** result, size_t size, size_t knownMaxOrDefault){
+    if (knownMaxOrDefault == 0)
+        knownMaxOrDefault = 32767;
+
+    if (size > knownMaxOrDefault || buff->index + size >= buff->size){
+        perror(size > knownMaxOrDefault ? 
+            "Attempted to read string that is too large\n" 
+          : "Attempted to read string past end of buffer\n"
+        );
+        errno = EOVERFLOW;
+        return -1;
+    }
+    *result = malloc(size);
+    memcpy(*result, buff->data + buff->index, size);
+    buff->index += size;
+    return 0;
+}
 // Copy buffer, of maxSize, with no heap allocations
 int decodeFixedString(BUFF* buff, uint8_t* result, size_t maxSize){
     int32_t size = 0;
@@ -246,5 +263,23 @@ int encodeString(BUFF** buff, const uint8_t* string, size_t knownMaxOrDefault){
     (*buff)->index += byteLength;
     (*buff)->size = (*buff)->index;
     return 0;
+}
 
+int encodeStringPreSized(BUFF** buff, const uint8_t* string, size_t byteLength, size_t knownMaxOrDefault){
+    if (knownMaxOrDefault == 0)
+        knownMaxOrDefault = 32767;
+    
+    // size_t byteLength = strlen((const char*)string);
+    if (byteLength > knownMaxOrDefault){
+        perror("Attempted to write string that is too large\n");
+        errno = EOVERFLOW;
+        return -1;
+    }
+    // encodeVarInt(buff, byteLength);
+    if (0 != extendFor(buff, (*buff)->index + byteLength))
+        return -1;
+    memcpy((*buff)->index + (*buff)->data, string, byteLength);
+    (*buff)->index += byteLength;
+    (*buff)->size = (*buff)->index;
+    return 0;
 }

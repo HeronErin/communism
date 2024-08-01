@@ -1,7 +1,7 @@
 CC      = gcc
 
 # provide debug info, then include dirs
-CFLAGS  = -g -I../cJSON -I../zlib
+CFLAGS  = -g -I../cJSON -I../zlib -I../protocol
 RM      = rm -f
 
 
@@ -9,14 +9,14 @@ SRC   = $(wildcard *.c)
 OBJS= $(SRC:.c=.o)
 
 
-default: protocol server
+default: server
 
 protocol:
 	make -C ../protocol
 
 
-server: $(OBJS)
-	$(CC) $(CFLAGS) -o server $(OBJS)
+server: protocol $(OBJS)
+	$(CC) $(CFLAGS) -o server $(OBJS) ../protocol/protocol.o
 run: server
 	./server
 clean:

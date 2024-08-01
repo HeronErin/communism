@@ -26,7 +26,8 @@ typedef enum {
     FID_PROP_NUMBER,
     FID_PROPERTIES,
     FID_STRICT_ERROR_HANDLING,
-    FID_THRESHOLD
+    FID_THRESHOLD,
+    FID_STRING_SIZE
 
 } PACKET_FIELD_ID;
 
@@ -85,12 +86,12 @@ struct _PacketFieldData {
         struct _PacketFieldData* optionalFieldData; // Null if not present
         struct {
             union{
-                char* stringLength;
-                char* identifierLength;
+                int stringLength;
+                int identifierLength;
             };
             union{
-                char* stringData;
-                char* identifierData;
+                unsigned char* stringData;
+                unsigned char* identifierData;
             };
         };        
         struct {
@@ -105,3 +106,22 @@ struct _PacketFieldData {
     };
 };
 typedef struct _PacketFieldData PacketFieldData;
+PacketFieldData* searchFieldsForId(PACKET_FIELD_ID field, PacketFieldData* data, int length);
+PacketFieldData* makeFieldDataPackageFor(const FieldConstructor* constructor, int size);
+PacketFieldData* decodePacket(const FieldConstructor* constructor, int size, BUFF* buff);
+int encodePacket(const FieldConstructor *constructor, int size, PacketFieldData* fieldData, BUFF** buff);
+
+// Packet defs:
+
+// Clientbound:
+extern const PacketConstructor StatusResponseS2C;
+extern const PacketConstructor PingResponseS2C;
+extern const PacketConstructor DisconnectS2C;
+extern const PacketConstructor EncryptionRequestS2C;
+extern const PacketConstructor LoginSuccessS2C;
+extern const PacketConstructor SetCompressionS2C;
+
+// Serverbound
+extern const PacketConstructor HanshakeC2S;
+extern const PacketConstructor StatusRequestC2S;
+extern const PacketConstructor PingRequestC2S;
