@@ -5,6 +5,8 @@
 #include "buffer.h"
 #include <unistd.h>
 #include <stdlib.h>
+#include <errno.h>
+#include <string.h>
 
 
 #include "packets.h"
@@ -26,20 +28,38 @@ TCP_ACTION packet(void* worldState, void** playerSate, int fd){
     read(fd, packet, size);
     BUFF* b = quickBuff(size, packet);
     decodeVarInt(b, &type);
-
     printf("Packet of %d type in mode %lu\n", type, st);
+
+
     if (st == 0){
         if (type == 0){
             PacketFieldData* p = decodePacket(HanshakeC2S.fields, HanshakeC2S.size, b);
             if (p == NULL) return TCP_ACT_DISCONNECT_CLIENT;
-            PacketFieldData* addr = searchFieldsForId(FID_SERVER_ADDRESS, p, HanshakeC2S.size);
-            printf("Addr: %llu: %s\n", (size_t)addr, addr->stringData);
-
+            PacketFieldData* addr = searchFieldsForId(FID_NEXT_STATE, p, HanshakeC2S.size);
+            st = addr->varIntData;
+        }
+    }else if(st == 1){
+        if (type == 0){
+            BUFF* out = makeBuff(0, 0);
+            PacketFieldData* data = makeFieldDataPackageFor(StatusResponseS2C.fields, StatusResponseS2C.size);
+            data[1].stringData = "{ \"version\": { \"name\": \"1.19.4\", \"protocol\": 762 }, \"players\": { \"max\": 100, \"online\": 5, \"sample\": [ { \"name\": \"thinkofdeath\", \"id\": \"4566e69f-c907-48ee-8d71-d7ba5aa00d20\" } ] }, \"description\": { \"text\": \"Hello, world!\" }, \"favicon\": \"data:image/png;base64,<data>\", \"enforcesSecureChat\": false }";
+            printf("Sending\n");
+            if (0!=sendPacketRaw(&StatusResponseS2C, data, fd))
+                perror("Shite");
+            else
+                printf("");
+            free(out);
         }
     }else{
         printf("State: %lu\n", st);
     }
+    *(size_t*)playerSate = st;
     free(packet);
+    if (errno != 0){
+        perror("Error with player packet");
+        errno = 0;
+        return TCP_ACT_DISCONNECT_CLIENT;
+    }
     return TCP_ACT_NOTHING;
 }
 
